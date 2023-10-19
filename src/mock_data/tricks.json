@@ -1,0 +1,16 @@
+[
+  {
+    "id": 0,
+    "name": "Dock Start",
+    "image": "https://i.ytimg.com/vi/Q4PAV3ewWNQ/maxresdefault.jpg",
+    "skillLevel": 0,
+    "description": "This is the easiest thing you can do in wakeboarding, just a simple start, to get yourself on the board"
+  },
+  {
+    "id": 1,
+    "name": "Ollie",
+    "image": "https://scontent.fvno2-1.fna.fbcdn.net/v/t1.6435-9/104864179_4083393105036599_6577581534048503917_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=9267fe&_nc_ohc=SmDL75zh3wwAX_OJ4QC&_nc_ht=scontent.fvno2-1.fna&oh=00_AfBTKGRYiKpHTTkIHWCgi_eQ0jcaw4LoRZG4xYUtR2ZRiA&oe=6489C96F",
+    "skillLevel": 0,
+    "description": "First thing to do, to get the board off of the ground"
+  }
+]

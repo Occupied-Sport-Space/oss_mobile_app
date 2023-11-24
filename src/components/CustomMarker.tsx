@@ -9,10 +9,10 @@ interface CustomMarkerProps {
     longitude: number;
   };
   markerLogo: string;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
-enum typeToLogo {
+export enum typeToLogo {
   volley = 'volleyball',
   basketball = 'basketball',
   gym = 'dumbbell',

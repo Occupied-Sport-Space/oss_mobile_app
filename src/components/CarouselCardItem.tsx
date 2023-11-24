@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Card } from 'react-native-paper';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Park } from '../types/types';
 
@@ -17,11 +17,15 @@ const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
   return (
     <Card
       mode="elevated"
-      style={{ backgroundColor: '#222', width: '40%', margin: 5 }}
+      style={{ backgroundColor: '#222', width: 180, margin: 5 }}
       onPress={onPress}
     >
       <Cover source={{ uri: logo }} />
-      <Title title={name} titleStyle={{ color: '#FFF' }} />
+      <Title
+        title={name}
+        className="max-w-[180px]"
+        titleStyle={{ color: '#FFF' }}
+      />
       <Content style={{ marginTop: -10 }}>
         <Text className="text-white">
           <MaterialCommunityIcons name="calendar-check" size={15} />:{' '}

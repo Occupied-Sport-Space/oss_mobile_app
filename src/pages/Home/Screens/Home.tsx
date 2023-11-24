@@ -1,12 +1,12 @@
 import React, { FC, useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CarouselCardItem from '../../../components/CarouselCardItem';
 import {
   homeNativeStackRouteState,
-  parkState,
+  sportSpaceState,
   userState,
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
@@ -17,11 +17,11 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
 }) => {
   const user = useRecoilValue(userState);
-  const [parks, setParks] = useRecoilState(parkState);
+  const [sportSpaces, setSportSpaces] = useRecoilState(sportSpaceState);
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
 
   useEffect(() => {
-    setParks(parkData as Park[]);
+    setSportSpaces(parkData as Park[]);
     setHomeRoute('MainHome');
   }, []);
 
@@ -33,9 +33,9 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
         Welcome, <Text className="text-blue-300 text-4xl">{user.name}</Text>
       </Text>
       <Text className="text-white text-xl mt-2 mx-2">Volleyball courts</Text>
-      <View className="flex-row">
-        {parks &&
-          parks
+      <ScrollView horizontal={true}>
+        {sportSpaces &&
+          sportSpaces
             .filter(({ markerLogo }) => markerLogo === 'volley')
             .map(({ id, ...park }) => (
               <CarouselCardItem
@@ -44,11 +44,11 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
                 park={{ id, ...park }}
               />
             ))}
-      </View>
+      </ScrollView>
       <Text className="text-white text-xl mt-2 mx-2">Basketball courts</Text>
-      <View className="flex-row">
-        {parks &&
-          parks
+      <ScrollView horizontal={true}>
+        {sportSpaces &&
+          sportSpaces
             .filter(({ markerLogo }) => markerLogo === 'basketball')
             .map(({ id, ...park }) => (
               <CarouselCardItem
@@ -57,11 +57,11 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
                 park={{ id, ...park }}
               />
             ))}
-      </View>
+      </ScrollView>
       <Text className="text-white text-xl mt-2 mx-2">Gym</Text>
-      <View className="flex-row">
-        {parks &&
-          parks
+      <ScrollView horizontal={true}>
+        {sportSpaces &&
+          sportSpaces
             .filter(({ markerLogo }) => markerLogo === 'gym')
             .map(({ id, ...park }) => (
               <CarouselCardItem
@@ -70,7 +70,7 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
                 park={{ id, ...park }}
               />
             ))}
-      </View>
+      </ScrollView>
     </ScrollView>
   );
 };

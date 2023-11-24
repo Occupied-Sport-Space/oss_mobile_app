@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useRecoilState } from 'recoil';
-import { parkState } from '../../state/atoms';
+import { sportSpaceState } from '../../state/atoms';
 import { Park } from '../../../src/types/types';
 import parkData from '../../mock_data/parks.json';
 import MapScreen from './Screens/Map';
@@ -15,7 +15,7 @@ export type MapTabProps = {
 const { Navigator, Screen } = createNativeStackNavigator<MapTabProps>();
 
 const MapTabs = () => {
-  const [parks, setParks] = useRecoilState(parkState);
+  const [parks, setParks] = useRecoilState(sportSpaceState);
 
   useEffect(() => {
     new Promise((res) => {

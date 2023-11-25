@@ -2,7 +2,9 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './Screens/Home';
 import ParkDetailScreen from '../../components/screens/ParkDetails';
-import parks from '../../mock_data/parks.json';
+import { useRecoilValue } from 'recoil';
+import { sportSpaceState } from '../../state/atoms';
+import { View, Text } from 'react-native';
 
 export type HomeTabProps = {
   MainHome: undefined;
@@ -13,6 +15,15 @@ export type HomeTabProps = {
 const { Navigator, Screen } = createNativeStackNavigator<HomeTabProps>();
 
 const HomeTabs = () => {
+  const sportSpaces = useRecoilValue(sportSpaceState);
+
+  if (!sportSpaces)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+
   return (
     <Navigator
       initialRouteName="MainHome"
@@ -35,7 +46,7 @@ const HomeTabs = () => {
       <Screen
         name="ParkDetail"
         options={({ route }) => ({
-          title: parks.find(({ id }) => id === route.params.id)!.name,
+          title: sportSpaces.find(({ id }) => id === route.params.id)!.name,
         })}
         component={ParkDetailScreen}
       />

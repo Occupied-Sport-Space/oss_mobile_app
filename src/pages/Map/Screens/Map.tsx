@@ -2,24 +2,29 @@ import React, { FC, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Searchbar } from 'react-native-paper';
-import parkData from '../../../mock_data/parks.json';
+import { useRecoilValue } from 'recoil';
 import CustomMarker, { typeToLogo } from '../../../components/CustomMarker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MapTabProps } from '../MapTabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { sportSpaceState } from '../../../state/atoms';
 
 const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
   navigation,
 }) => {
   const [searchVal, setSearchVal] = useState('');
+  const sportSpaces = useRecoilValue(sportSpaceState);
+
   const filteredData = useMemo(
     () =>
-      parkData.filter(
-        ({ name, markerLogo }) =>
-          name.toLowerCase().includes(searchVal) ||
-          markerLogo.includes(searchVal)
-      ),
-    [searchVal]
+      sportSpaces
+        ? sportSpaces.filter(
+            ({ name, markerLogo }) =>
+              name.toLowerCase().includes(searchVal) ||
+              markerLogo.includes(searchVal)
+          )
+        : [],
+    [searchVal, sportSpaces]
   );
 
   const onNavigate = (id: number) => navigation.navigate('ParkDetail', { id });
@@ -42,6 +47,7 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
               <TouchableOpacity
                 onPress={() => onNavigate(id)}
                 className="flex-row items-center"
+                key={`search_${name}_${id}`}
               >
                 <MaterialCommunityIcons
                   name={typeToLogo[markerLogo]}

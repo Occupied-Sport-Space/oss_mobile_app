@@ -12,6 +12,7 @@ const LoginScreen = () => {
   const [user, setUser] = useRecoilState(userState);
   const [login, setLogin] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [responseErr, setError] = useState('');
   const [formState, setFormState] = useState({
     email: '',
     password: '',
@@ -88,6 +89,20 @@ const LoginScreen = () => {
       });
     }
 
+    const handleError = (err: any) => {
+      setFormState({
+        ...formState,
+        errors: {
+          email: '',
+          name: '',
+          password: '',
+          passwordConfirm: '',
+        },
+      });
+      setError(err.data.message);
+      console.log(err.data);
+    };
+
     if (login) {
       handleLogin()
         .then(({ record: { email, username, id, token } }) => {
@@ -100,7 +115,7 @@ const LoginScreen = () => {
           setUser(newUser);
           setItem(StorageKeys.USER, JSON.stringify(newUser));
         })
-        .catch((err) => console.log(err))
+        .catch(handleError)
         .then(() => setLoading(false));
     } else {
       const userData = {
@@ -123,10 +138,10 @@ const LoginScreen = () => {
               setUser(newUser);
               setItem(StorageKeys.USER, JSON.stringify(newUser));
             })
-            .catch((err) => console.error(err))
+            .catch(handleError)
             .then(() => setLoading(false));
         })
-        .catch((err) => console.error(err));
+        .catch(handleError);
     }
 
     setLoading(false);
@@ -183,6 +198,13 @@ const LoginScreen = () => {
                 setFormState({ ...formState, passwordConfirm: text })
               }
             />
+          )}
+          {responseErr && (
+            <View>
+              <Text className="my-2 text-red-400 font-semibold text-center">
+                {responseErr}
+              </Text>
+            </View>
           )}
           <View className="flex flex-row">
             <Button

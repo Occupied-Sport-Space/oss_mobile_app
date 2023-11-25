@@ -10,18 +10,15 @@ import {
   userState,
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
-import parkData from '../../../mock_data/parks.json';
-import { Park } from 'src/types/types';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
 }) => {
   const user = useRecoilValue(userState);
-  const [sportSpaces, setSportSpaces] = useRecoilState(sportSpaceState);
+  const sportSpaces = useRecoilValue(sportSpaceState);
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
 
   useEffect(() => {
-    setSportSpaces(parkData as Park[]);
     setHomeRoute('MainHome');
   }, []);
 

@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { sportSpaceState } from '../../state/atoms';
-import { Park } from '../../../src/types/types';
-import parkData from '../../mock_data/parks.json';
 import MapScreen from './Screens/Map';
 import ParkDetailScreen from '../../components/screens/ParkDetails';
 
@@ -15,19 +13,9 @@ export type MapTabProps = {
 const { Navigator, Screen } = createNativeStackNavigator<MapTabProps>();
 
 const MapTabs = () => {
-  const [parks, setParks] = useRecoilState(sportSpaceState);
+  const sportSpaces = useRecoilValue(sportSpaceState);
 
-  useEffect(() => {
-    new Promise((res) => {
-      setTimeout(() => {
-        res(parkData);
-      }, 1000);
-    }).then((data) => {
-      setParks(data as Park[]);
-    });
-  }, []);
-
-  if (!parks) return null;
+  if (!sportSpaces) return null;
 
   return (
     <Navigator
@@ -48,7 +36,7 @@ const MapTabs = () => {
       <Screen
         name="ParkDetail"
         options={({ route }) => ({
-          title: parks.find(({ id }) => id === route.params.id)!.name,
+          title: sportSpaces.find(({ id }) => id === route.params.id)!.name,
         })}
         component={ParkDetailScreen}
       />

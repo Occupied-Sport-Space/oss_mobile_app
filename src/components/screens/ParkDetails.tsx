@@ -22,8 +22,8 @@ type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
-  const parks = useRecoilValue(sportSpaceState);
-  const detailPark = parks?.find((park) => park.id === id);
+  const sportSpaces = useRecoilValue(sportSpaceState);
+  const detailPark = sportSpaces?.find((park) => park.id === id);
 
   if (!detailPark) return null;
   const {
@@ -69,7 +69,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
           ? 0
           : randomAvailability
       );
-    }, 10000);
+    }, 1500);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -79,9 +79,17 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       <Image className="w-max h-[125px]" source={{ uri: logo }} />
       <View className="p-5">
         <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
-        <Text className="text-white text-2xl font-semibold mb-2">
-          Avalability: {visibleAvailability}%
-        </Text>
+        <View className="mt-3 mb-4">
+          <Text className="text-white text-2xl font-semibold mb-2">
+            Avalability ({visibleAvailability}%)
+          </Text>
+          <View className="bg-gray-400 rounded-md">
+            <View
+              className="bg-[#23395d] p-3 rounded-md"
+              style={{ width: `${visibleAvailability}%` }}
+            ></View>
+          </View>
+        </View>
         <View className="bg-gray-700 mt-2 rounded-xl">
           <TouchableOpacity
             className="rounded-xl overflow-hidden"
@@ -120,12 +128,12 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         </View>
         <Text className="text-white text-xl mt-4">Other alternatives!</Text>
         <ScrollView horizontal={true}>
-          {parks &&
-          parks?.filter(
+          {sportSpaces &&
+          sportSpaces?.filter(
             ({ markerLogo, id }) =>
               markerLogo === detailPark.markerLogo && id !== detailPark.id
           ).length ? (
-            parks
+            sportSpaces
               ?.filter(
                 ({ markerLogo, id }) =>
                   markerLogo === detailPark.markerLogo && id !== detailPark.id

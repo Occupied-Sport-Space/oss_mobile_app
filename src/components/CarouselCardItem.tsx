@@ -12,7 +12,7 @@ interface CardItemProps {
 }
 
 const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
-  const { name, logo, availability, estimateWait } = park;
+  const { name, logo, availability, address } = park;
 
   return (
     <Card
@@ -31,9 +31,8 @@ const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
           <MaterialCommunityIcons name="calendar-check" size={15} />:{' '}
           {Math.round(availability * 100)}%
         </Text>
-        <Text className="text-white mt-2">
-          <MaterialCommunityIcons name="clock-outline" size={15} />:{' '}
-          {estimateWait}
+        <Text className="text-white mt-2 whitespace-nowrap">
+          <MaterialCommunityIcons name="map-marker" size={15} />: {address}
         </Text>
       </Content>
     </Card>

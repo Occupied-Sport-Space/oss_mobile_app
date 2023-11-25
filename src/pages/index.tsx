@@ -6,9 +6,15 @@ import MapTabs from './Map/MapTabs';
 import SettingsTabs from './Settings/SettingsTabs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { homeNativeStackRouteState, userState } from '../state/atoms';
+import {
+  homeNativeStackRouteState,
+  sportSpaceState,
+  userState,
+} from '../state/atoms';
 import LoginScreen from './Home/Screens/Authentication/LoginScreen';
 import { StorageKeys, getItem } from '../utils/asyncStorage';
+import { Park } from '../types/types';
+import { pb } from '../utils/pocketbase';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -20,6 +26,7 @@ const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
 
 const AppRouter = () => {
   const [user, setUser] = useRecoilState(userState);
+  const [_, setSportSpaces] = useRecoilState(sportSpaceState);
   const homeNativeTab = useRecoilValue(homeNativeStackRouteState);
 
   useEffect(() => {
@@ -28,6 +35,12 @@ const AppRouter = () => {
         setUser(data);
       }
     });
+
+    pb.collection('sportSpaces')
+      .getFullList()
+      .then((data: unknown) => {
+        setSportSpaces(data as Park[]);
+      });
   }, []);
 
   if (!user) {

@@ -19,8 +19,8 @@ const HomeTabs = () => {
 
   if (!sportSpaces)
     return (
-      <View>
-        <Text>Loading...</Text>
+      <View className="bg-black h-full flex justify-center items-center">
+        <Text className="text-white text-xl">Loading...</Text>
       </View>
     );
 

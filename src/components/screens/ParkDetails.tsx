@@ -16,6 +16,8 @@ import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
+import { pb } from '../../utils/pocketbase';
+import { Park } from '../../types/types';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -23,7 +25,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const sportSpaces = useRecoilValue(sportSpaceState);
-  const detailPark = sportSpaces?.find((park) => park.id === id);
+  const [detailPark, setDetailPark] = useState(
+    sportSpaces?.find((park) => park.id === id)
+  );
 
   if (!detailPark) return null;
   const {
@@ -34,9 +38,6 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     coords: { latitude, longitude },
     markerLogo,
   } = detailPark;
-  const [visibleAvailability, setAvailability] = useState(
-    Math.round(availability * 100)
-  );
 
   const onMapPress = () => {
     Alert.alert(`How to get to ${name}`, undefined, [
@@ -57,21 +58,18 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     setHomeRoute('ParkDetail');
 
-    // The most dumb thing I've written this year.. Only for pitch
-    const intervalId = setInterval(() => {
-      const max = visibleAvailability + 10;
-      const min = visibleAvailability - 10;
-      const randomAvailability = Math.floor(Math.random() * (max - min) + min);
-      setAvailability(
-        randomAvailability > 100
-          ? 100
-          : randomAvailability < 0
-          ? 0
-          : randomAvailability
-      );
-    }, 1500);
+    pb.collection('sportSpaces').subscribe(
+      id,
+      ({ record, action }: { action: string; record: unknown }) => {
+        if (action === 'update') {
+          setDetailPark(record as Park);
+        }
+      }
+    );
 
-    return () => clearInterval(intervalId);
+    return () => {
+      pb.collection('sportSpaces').unsubscribe();
+    };
   }, []);
 
   return (
@@ -81,12 +79,12 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
-            Avalability ({visibleAvailability}%)
+            Avalability ({availability}%)
           </Text>
           <View className="bg-gray-400 rounded-md">
             <View
               className="bg-[#23395d] p-3 rounded-md"
-              style={{ width: `${visibleAvailability}%` }}
+              style={{ width: `${availability}%` }}
             ></View>
           </View>
         </View>

@@ -65,7 +65,7 @@ const LoginScreen = () => {
           name: 'Required!',
         },
       });
-    } else if (!passwordRegex.test(password)) {
+    } else if (!passwordRegex.test(password) && !login) {
       setLoading(false);
       return setFormState({
         ...formState,

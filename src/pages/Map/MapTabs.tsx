@@ -7,7 +7,7 @@ import ParkDetailScreen from '../../components/screens/ParkDetails';
 
 export type MapTabProps = {
   MainMap: undefined;
-  ParkDetail: { id: number };
+  ParkDetail: { id: string };
 };
 
 const { Navigator, Screen } = createNativeStackNavigator<MapTabProps>();

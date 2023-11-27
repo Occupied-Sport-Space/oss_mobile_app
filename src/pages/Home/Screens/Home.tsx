@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -10,19 +10,32 @@ import {
   userState,
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
+import { pb } from '../../../utils/pocketbase';
+import { Park } from '../../../types/types';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
 }) => {
   const user = useRecoilValue(userState);
-  const sportSpaces = useRecoilValue(sportSpaceState);
+  const [sportSpaces, setSportSpaces] = useRecoilState(sportSpaceState);
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
 
   useEffect(() => {
     setHomeRoute('MainHome');
+
+    pb.collection('sportSpaces')
+      .getFullList()
+      .then((data: unknown) => {
+        setSportSpaces(data as Park[]);
+      });
   }, []);
 
-  if (!user) return null;
+  if (!sportSpaces || !user)
+    return (
+      <View className="bg-black h-full flex justify-center items-center">
+        <Text className="text-white text-xl">Loading...</Text>
+      </View>
+    );
 
   return (
     <ScrollView className="flex-1 bg-black bg-opacity-30 text-white">

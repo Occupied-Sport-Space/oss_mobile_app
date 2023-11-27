@@ -27,7 +27,7 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
     [searchVal, sportSpaces]
   );
 
-  const onNavigate = (id: number) => navigation.navigate('ParkDetail', { id });
+  const onNavigate = (id: string) => navigation.navigate('ParkDetail', { id });
 
   return (
     <View className="flex-1">

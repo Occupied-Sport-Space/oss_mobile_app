@@ -8,7 +8,7 @@ export interface Trick {
 }
 
 export interface Park {
-  id: number
+  id: string
   coords: {
     latitude: number,
     longitude: number

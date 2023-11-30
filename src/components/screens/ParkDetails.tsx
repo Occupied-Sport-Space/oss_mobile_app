@@ -17,7 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MapView from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
 import { pb } from '../../utils/pocketbase';
-import { Park } from '../../types/types';
+import { DurationEnum, Park } from '../../types/types';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -25,6 +25,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const sportSpaces = useRecoilValue(sportSpaceState);
+  const [percentageAvailable, setPercentageAvailable] = useState(0);
   const [detailPark, setDetailPark] = useState(
     sportSpaces?.find((park) => park.id === id)
   );
@@ -35,6 +36,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     name,
     address,
     availability,
+    maxAvailable,
+    link,
+    price,
     coords: { latitude, longitude },
     markerLogo,
   } = detailPark;
@@ -72,6 +76,23 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     };
   }, []);
 
+  const getText = (duration: DurationEnum) => {
+    switch (duration) {
+      case DurationEnum.DAY:
+        return 'Day';
+      case DurationEnum.MONTH:
+        return 'Month';
+      case DurationEnum.YEAR:
+        return 'Year';
+      default:
+        return 'Day';
+    }
+  };
+
+  useEffect(() => {
+    setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
+  }, [availability, maxAvailable]);
+
   return (
     <ScrollView className="flex-1 bg-black">
       <Image className="w-max h-[125px]" source={{ uri: logo }} />
@@ -79,12 +100,12 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
-            Avalability ({availability}%)
+            Avalability ({percentageAvailable}%)
           </Text>
           <View className="bg-gray-400 rounded-md">
             <View
               className="bg-[#23395d] p-3 rounded-md"
-              style={{ width: `${availability}%` }}
+              style={{ width: `${percentageAvailable}%` }}
             ></View>
           </View>
         </View>
@@ -94,6 +115,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
             onPress={onMapPress}
           >
             <MapView
+              provider="google"
               initialRegion={{
                 latitude,
                 longitude,
@@ -123,6 +145,44 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
               <Text className="text-white text-2xl ml-3">{address}</Text>
             </View>
           </TouchableOpacity>
+        </View>
+        <View className="flex-row justify-between">
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(link);
+            }}
+            className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex items-center justify-between"
+          >
+            <Text className="text-white text-2xl">
+              <MaterialCommunityIcons name="web" size={25} />
+            </Text>
+            <Text className="text-white text-2xl text-center">
+              Visit {name} here!
+            </Text>
+          </TouchableOpacity>
+          <View className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex justify-between">
+            <View className="flex-row">
+              <Text className="text-white text-2xl">
+                <MaterialCommunityIcons name="cash" size={25} />
+              </Text>
+              <Text className="text-white text-2xl ml-3">Prices:</Text>
+            </View>
+            <View>
+              {Array.isArray(price) ? (
+                price.map(({ price, duration }) => (
+                  <View className="mb-1" key={duration}>
+                    <Text className="text-white text-xl">
+                      {price}€ / {getText(duration)}
+                    </Text>
+                  </View>
+                ))
+              ) : (
+                <Text className="text-white text-2xl text-center">
+                  Free of charge!
+                </Text>
+              )}
+            </View>
+          </View>
         </View>
         <Text className="text-white text-xl mt-4">Other alternatives!</Text>
         <ScrollView horizontal={true}>

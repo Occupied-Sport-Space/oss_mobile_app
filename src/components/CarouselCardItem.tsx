@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Card } from 'react-native-paper';
 import { Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,7 +12,12 @@ interface CardItemProps {
 }
 
 const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
-  const { name, logo, availability, address } = park;
+  const { name, logo, availability, maxAvailable, address } = park;
+  const [percentageAvailable, setPercentageAvailable] = useState(0);
+
+  useEffect(() => {
+    setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
+  }, [availability, maxAvailable]);
 
   return (
     <Card
@@ -29,7 +34,7 @@ const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
       <Content style={{ marginTop: -10 }}>
         <Text className="text-white">
           <MaterialCommunityIcons name="calendar-check" size={15} />:{' '}
-          {Math.round(availability * 100)}%
+          {percentageAvailable}%
         </Text>
         <Text className="text-white mt-2 whitespace-nowrap">
           <MaterialCommunityIcons name="map-marker" size={15} />: {address}

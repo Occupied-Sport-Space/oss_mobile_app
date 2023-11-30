@@ -70,6 +70,7 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
           longitudeDelta: 1,
         }}
         minZoomLevel={12}
+        provider="google"
         className="w-full h-full z-10"
       >
         {filteredData.map(({ id, name, ...park }) => (

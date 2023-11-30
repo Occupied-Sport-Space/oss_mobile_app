@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "wake_trainer",
+    "name": "OSS",
     "slug": "oss",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#23395d"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.psorigins.oss"
@@ -23,7 +21,8 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#23395d"
       },
-      "package": "com.psorigins.oss"
+      "package": "com.psorigins.oss",
+      "buildType": "apk"
     },
     "web": {
       "favicon": "./assets/favicon.png"

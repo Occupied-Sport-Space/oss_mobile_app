@@ -7,6 +7,17 @@ export interface Trick {
   description: string
 }
 
+export enum DurationEnum {
+  MONTH = 'MONTH',
+  YEAR = 'YEAR',
+  DAY = 'DAY'
+}
+
+export interface Price {
+  price: number;
+  duration: DurationEnum;
+}
+
 export interface Park {
   id: string
   coords: {
@@ -15,10 +26,11 @@ export interface Park {
   }
   name: string
   link: string
-  price: { total: number, duration: string }
+  price: Price[] | Price;
   logo: string
   markerLogo: string;
   availability: number;
+  maxAvailable: number;
   estimateWait: string;
   address: string;
 }

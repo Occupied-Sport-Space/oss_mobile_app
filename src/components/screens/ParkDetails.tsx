@@ -101,7 +101,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
-            Avalability ({percentageAvailable}%)
+            Avalability {availability}/{maxAvailable} ({percentageAvailable}%)
           </Text>
           <View className="bg-gray-400 rounded-md">
             <View

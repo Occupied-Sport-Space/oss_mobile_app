@@ -31,8 +31,8 @@ const HomeTabs = () => {
       <Screen
         name="MainHome"
         component={HomeScreen}
-        options={({ navigation }) => ({
-          title: 'Occupied Sport Society',
+        options={() => ({
+          title: 'Occupied Sport Space',
         })}
       />
       <Screen

@@ -8,13 +8,14 @@ import {
   Alert,
   TouchableOpacity,
   Linking,
+  Platform,
 } from 'react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, sportSpaceState } from '../../state/atoms';
 import { HomeTabProps } from '../../pages/Home/HomeTabs';
 import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MapView from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
 import { pb } from '../../utils/pocketbase';
 import { DurationEnum, Park } from '../../types/types';
@@ -115,7 +116,8 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
             onPress={onMapPress}
           >
             <MapView
-              provider="google"
+              provider={PROVIDER_GOOGLE}
+              mapType={Platform.OS == 'android' ? 'none' : 'standard'}
               initialRegion={{
                 latitude,
                 longitude,
@@ -151,16 +153,16 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
             onPress={() => {
               Linking.openURL(link);
             }}
-            className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[160px] flex items-center justify-between"
+            className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex items-center justify-between"
           >
             <Text className="text-white text-2xl">
               <MaterialCommunityIcons name="web" size={25} />
             </Text>
             <Text className="text-white text-2xl text-center">
-              Visit {name} here!
+              Visit {name.substring(0, 10) + '...'} here!
             </Text>
           </TouchableOpacity>
-          <View className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[160px] flex justify-between">
+          <View className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex justify-between">
             <View className="flex-row">
               <Text className="text-white text-2xl">
                 <MaterialCommunityIcons name="cash" size={25} />

@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import MapView from 'react-native-maps';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Searchbar } from 'react-native-paper';
 import { useRecoilValue } from 'recoil';
 import CustomMarker, { typeToLogo } from '../../../components/CustomMarker';
@@ -70,7 +70,8 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
           longitudeDelta: 1,
         }}
         minZoomLevel={12}
-        provider="google"
+        provider={PROVIDER_GOOGLE}
+        mapType={Platform.OS == 'android' ? 'none' : 'standard'}
         className="w-full h-full z-10"
       >
         {filteredData.map(({ id, name, ...park }) => (

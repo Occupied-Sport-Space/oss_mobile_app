@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import { useRecoilState } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
@@ -150,7 +150,10 @@ const LoginScreen = () => {
   if (user) return null;
 
   return (
-    <View className="bg-black w-[100vw] h-[100vh] flex items-center justify-center">
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="bg-black w-[100vw] h-[100vh] flex items-center justify-center"
+    >
       <Text className="text-white text-3xl mt-3">
         Welcome to <Text className="text-blue-400">OSS</Text>
       </Text>
@@ -232,7 +235,7 @@ const LoginScreen = () => {
           </View>
         </Card.Content>
       </Card>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

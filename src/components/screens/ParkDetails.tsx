@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   Image,
@@ -8,7 +8,6 @@ import {
   Alert,
   TouchableOpacity,
   Linking,
-  Platform,
 } from 'react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, sportSpaceState } from '../../state/atoms';
@@ -24,6 +23,7 @@ type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
 const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
+  const scrollRef = useRef<any>(null);
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const sportSpaces = useRecoilValue(sportSpaceState);
   const [percentageAvailable, setPercentageAvailable] = useState(0);
@@ -60,23 +60,6 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     ]);
   };
 
-  useEffect(() => {
-    setHomeRoute('ParkDetail');
-
-    pb.collection('sportSpaces').subscribe(
-      id,
-      ({ record, action }: { action: string; record: unknown }) => {
-        if (action === 'update') {
-          setDetailPark(record as Park);
-        }
-      }
-    );
-
-    return () => {
-      pb.collection('sportSpaces').unsubscribe();
-    };
-  }, []);
-
   const getText = (duration: DurationEnum) => {
     switch (duration) {
       case DurationEnum.DAY:
@@ -91,11 +74,36 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    setHomeRoute('ParkDetail');
+  }, []);
+
+  useEffect(() => {
+    setDetailPark(sportSpaces?.find((park) => park.id === id));
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
+
+    pb.collection('sportSpaces').subscribe(
+      id,
+      ({ record, action }: { action: string; record: unknown }) => {
+        if (action === 'update') {
+          setDetailPark(record as Park);
+        }
+      }
+    );
+
+    return () => {
+      pb.collection('sportSpaces').unsubscribe(id);
+    };
+  }, [id]);
+
+  useEffect(() => {
     setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
   }, [availability, maxAvailable]);
 
   return (
-    <ScrollView className="flex-1 bg-black">
+    <ScrollView className="flex-1 bg-black" ref={scrollRef}>
       <Image className="w-max h-[125px]" source={{ uri: logo }} />
       <View className="p-5">
         <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
@@ -117,7 +125,6 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
           >
             <MapView
               provider={PROVIDER_GOOGLE}
-              mapType={Platform.OS == 'android' ? 'none' : 'standard'}
               initialRegion={{
                 latitude,
                 longitude,
@@ -153,23 +160,23 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
             onPress={() => {
               Linking.openURL(link);
             }}
-            className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex items-center justify-between"
+            className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] flex items-center justify-between"
           >
             <Text className="text-white text-2xl">
               <MaterialCommunityIcons name="web" size={25} />
             </Text>
-            <Text className="text-white text-2xl text-center">
-              Visit {name.substring(0, 10) + '...'} here!
+            <Text className="text-white mt-2 text-2xl text-center">
+              Visit {name} here!
             </Text>
           </TouchableOpacity>
-          <View className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] h-[150px] flex justify-between">
+          <View className="p-5 mt-5 bg-[#23395d] rounded-xl w-[48%] flex">
             <View className="flex-row">
               <Text className="text-white text-2xl">
                 <MaterialCommunityIcons name="cash" size={25} />
               </Text>
               <Text className="text-white text-2xl ml-3">Prices:</Text>
             </View>
-            <View>
+            <View className="flex flex-1 justify-center items-center">
               {Array.isArray(price) ? (
                 price.map(({ price, duration }) => (
                   <View className="mb-1" key={duration}>
@@ -200,7 +207,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
               )
               .map(({ id, ...park }) => (
                 <CarouselCardItem
-                  onPress={() => navigation.navigate('ParkDetail', { id })}
+                  onPress={() => {
+                    navigation.navigate('ParkDetail', { id });
+                  }}
                   key={id}
                   park={{ id, ...park }}
                 />

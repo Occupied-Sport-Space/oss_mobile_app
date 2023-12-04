@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Searchbar } from 'react-native-paper';
 import { useRecoilValue } from 'recoil';
@@ -71,7 +71,6 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
         }}
         minZoomLevel={12}
         provider={PROVIDER_GOOGLE}
-        mapType={Platform.OS == 'android' ? 'none' : 'standard'}
         className="w-full h-full z-10"
       >
         {filteredData.map(({ id, name, ...park }) => (

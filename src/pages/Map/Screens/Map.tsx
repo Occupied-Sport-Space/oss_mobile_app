@@ -70,6 +70,7 @@ const MapScreen: FC<NativeStackScreenProps<MapTabProps, 'MainMap'>> = ({
           longitudeDelta: 1,
         }}
         minZoomLevel={12}
+        showsUserLocation
         provider={PROVIDER_GOOGLE}
         className="w-full h-full z-10"
       >

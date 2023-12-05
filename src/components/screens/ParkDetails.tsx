@@ -27,6 +27,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const sportSpaces = useRecoilValue(sportSpaceState);
   const [percentageAvailable, setPercentageAvailable] = useState(0);
+  const [favourite, setFavourite] = useState(false);
   const [detailPark, setDetailPark] = useState(
     sportSpaces?.find((park) => park.id === id)
   );
@@ -106,7 +107,15 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     <ScrollView className="flex-1 bg-black" ref={scrollRef}>
       <Image className="w-max h-[125px]" source={{ uri: logo }} />
       <View className="p-5">
-        <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
+        <View className="flex-row justify-between">
+          <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
+          <MaterialCommunityIcons
+            name={favourite ? 'star' : 'star-outline'}
+            color={favourite ? 'gold' : 'white'}
+            size={30}
+            onPress={() => setFavourite(!favourite)}
+          />
+        </View>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
             Avalability {availability}/{maxAvailable} ({percentageAvailable}%)

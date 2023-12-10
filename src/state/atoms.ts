@@ -1,12 +1,12 @@
 import { atom } from "recoil";
-import { Park, User } from "../types/types";
+import { Space, User } from "../types/types";
 
 export const userState = atom<User | null>({
   key: 'userState',
   default: null,
 })
 
-export const sportSpaceState = atom<Park[] | null>({
+export const sportSpaceState = atom<Space[] | null>({
   key: 'parkState',
   default: null,
 })

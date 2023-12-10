@@ -70,14 +70,16 @@ const SettingsScreen: FC<
     if (user) {
       pb.collection('users')
         .update(user.id, {
-          username: newInfo.name,
+          username: newInfo.username,
+          email: newInfo.email,
         })
-        .then(({ id, email, username, token }) => {
+        .then(({ id, email, username, token, favorites }) => {
           const newUser = {
             id,
             email,
-            name: username,
+            username,
             token,
+            favorites,
           };
           setUser(newUser);
           setNewInfo(newUser);
@@ -90,10 +92,10 @@ const SettingsScreen: FC<
   return (
     <View className="bg-black w-[100vw] h-[100vh] p-4">
       <EditItem
-        title="Name"
-        value={newInfo.name!}
-        onChange={(name) => setNewInfo({ ...newInfo, name })}
-        onCancel={() => setNewInfo({ ...newInfo, name: user?.name })}
+        title="Username"
+        value={newInfo.username!}
+        onChange={(username) => setNewInfo({ ...newInfo, username })}
+        onCancel={() => setNewInfo({ ...newInfo, username: user?.username })}
       />
       <View className="py-1"></View>
       <EditItem

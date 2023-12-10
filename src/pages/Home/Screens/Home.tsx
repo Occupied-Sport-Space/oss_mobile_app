@@ -11,7 +11,8 @@ import {
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
 import { pb } from '../../../utils/pocketbase';
-import { Park } from '../../../types/types';
+import { Space } from '../../../types/types';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
@@ -26,7 +27,7 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
     pb.collection('sportSpaces')
       .getFullList()
       .then((data: unknown) => {
-        setSportSpaces(data as Park[]);
+        setSportSpaces(data as Space[]);
       });
   }, []);
 
@@ -40,8 +41,28 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   return (
     <ScrollView className="flex-1 bg-black bg-opacity-30 text-white">
       <Text className="text-white text-3xl my-5 mx-2">
-        Welcome, <Text className="text-blue-300 text-4xl">{user.name}</Text>
+        Welcome, <Text className="text-blue-300 text-4xl">{user.username}</Text>
       </Text>
+      {user.favorites.length && (
+        <>
+          <Text className="text-white text-xl mt-2 mx-2">
+            Favorite courts{' '}
+            <MaterialCommunityIcons name={'star'} color={'gold'} size={20} />
+          </Text>
+          <ScrollView horizontal={true}>
+            {sportSpaces &&
+              sportSpaces
+                .filter(({ id }) => user.favorites.includes(id))
+                .map(({ id, ...park }) => (
+                  <CarouselCardItem
+                    onPress={() => navigation.navigate('ParkDetail', { id })}
+                    key={id}
+                    park={{ id, ...park }}
+                  />
+                ))}
+          </ScrollView>
+        </>
+      )}
       <Text className="text-white text-xl mt-2 mx-2">Volleyball courts</Text>
       <ScrollView horizontal={true}>
         {sportSpaces &&

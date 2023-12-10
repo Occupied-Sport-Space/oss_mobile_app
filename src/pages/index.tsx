@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeTabs from './Home/HomeTabs';
 import MapTabs from './Map/MapTabs';
@@ -9,6 +9,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../state/atoms';
 import LoginScreen from './Home/Screens/Authentication/LoginScreen';
 import { StorageKeys, getItem } from '../utils/asyncStorage';
+import { pb } from '../utils/pocketbase';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -25,7 +26,18 @@ const AppRouter = () => {
   useEffect(() => {
     getItem(StorageKeys.USER).then((data) => {
       if (data) {
-        setUser(data);
+        pb.collection('users')
+          .authWithPassword(data.email, data.password)
+          .then(({ record: { email, username, id, token, favorites } }) => {
+            const newUser = {
+              id,
+              email,
+              username,
+              token,
+              favorites,
+            };
+            setUser(newUser);
+          });
       }
     });
   }, []);

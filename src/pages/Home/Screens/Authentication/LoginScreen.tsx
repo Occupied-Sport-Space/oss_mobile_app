@@ -109,11 +109,11 @@ const LoginScreen = () => {
           const newUser = {
             id,
             email,
-            name: username,
+            username,
             token,
           };
           setUser(newUser);
-          setItem(StorageKeys.USER, JSON.stringify(newUser));
+          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
         .catch(handleError)
         .then(() => setLoading(false));
@@ -132,7 +132,7 @@ const LoginScreen = () => {
               const newUser = {
                 id,
                 email,
-                name: username,
+                username,
                 token,
               };
               setUser(newUser);

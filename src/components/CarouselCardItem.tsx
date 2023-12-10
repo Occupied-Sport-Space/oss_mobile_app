@@ -2,12 +2,12 @@ import React, { FC, useEffect, useState } from 'react';
 import { Card } from 'react-native-paper';
 import { Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Park } from '../types/types';
+import { Space } from '../types/types';
 
 const { Title, Cover, Content } = Card;
 
 interface CardItemProps {
-  park: Park;
+  park: Space;
   onPress: any;
 }
 

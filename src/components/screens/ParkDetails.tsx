@@ -10,14 +10,18 @@ import {
   Linking,
 } from 'react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { homeNativeStackRouteState, sportSpaceState } from '../../state/atoms';
+import {
+  homeNativeStackRouteState,
+  sportSpaceState,
+  userState,
+} from '../../state/atoms';
 import { HomeTabProps } from '../../pages/Home/HomeTabs';
 import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
 import { pb } from '../../utils/pocketbase';
-import { DurationEnum, Park } from '../../types/types';
+import { DurationEnum, Space } from '../../types/types';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -26,8 +30,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const scrollRef = useRef<any>(null);
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const sportSpaces = useRecoilValue(sportSpaceState);
+  const [user, setUser] = useRecoilState(userState);
   const [percentageAvailable, setPercentageAvailable] = useState(0);
-  const [favourite, setFavourite] = useState(false);
+  const [favorite, setFavorite] = useState(false);
   const [detailPark, setDetailPark] = useState(
     sportSpaces?.find((park) => park.id === id)
   );
@@ -61,6 +66,29 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     ]);
   };
 
+  const handleFavourite = () => {
+    pb.collection('users')
+      .update(
+        user!.id,
+        !favorite
+          ? {
+              'favorites+': id,
+            }
+          : { 'favorites-': id }
+      )
+      .then(({ email, username, id, token, favorites }) => {
+        const newUser = {
+          id,
+          email,
+          username,
+          token,
+          favorites,
+        };
+        setUser(newUser);
+        setFavorite(!favorite);
+      });
+  };
+
   const getText = (duration: DurationEnum) => {
     switch (duration) {
       case DurationEnum.DAY:
@@ -79,7 +107,16 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    setDetailPark(sportSpaces?.find((park) => park.id === id));
+    setDetailPark(
+      sportSpaces?.find((park) => {
+        if (park.id === id) {
+          setFavorite(user?.favorites.includes(park.id) ?? false);
+          return true;
+        }
+
+        return false;
+      })
+    );
     scrollRef.current?.scrollTo({
       y: 0,
       animated: true,
@@ -89,7 +126,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       id,
       ({ record, action }: { action: string; record: unknown }) => {
         if (action === 'update') {
-          setDetailPark(record as Park);
+          setDetailPark(record as Space);
         }
       }
     );
@@ -110,10 +147,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         <View className="flex-row justify-between">
           <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
           <MaterialCommunityIcons
-            name={favourite ? 'star' : 'star-outline'}
-            color={favourite ? 'gold' : 'white'}
+            name={favorite ? 'star' : 'star-outline'}
+            color={favorite ? 'gold' : 'white'}
             size={30}
-            onPress={() => setFavourite(!favourite)}
+            onPress={handleFavourite}
           />
         </View>
         <View className="mt-3 mb-4">

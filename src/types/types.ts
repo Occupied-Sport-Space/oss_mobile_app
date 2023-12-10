@@ -18,7 +18,7 @@ export interface Price {
   duration: DurationEnum;
 }
 
-export interface Park {
+export interface Space {
   id: string
   coords: {
     latitude: number,
@@ -37,7 +37,8 @@ export interface Park {
 
 export interface User {
   id: string;
-  name: string;
+  username: string;
+  favorites: string[];
   email: string;
   token: string;
 }

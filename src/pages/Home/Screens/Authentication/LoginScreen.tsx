@@ -5,12 +5,13 @@ import { useRecoilState } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
 import Input from '../../../../components/Input';
 import { pb } from '../../../../utils/pocketbase';
-import { StorageKeys, setItem } from '../../../../utils/asyncStorage';
+import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
 
 const LoginScreen = () => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const [user, setUser] = useRecoilState(userState);
   const [login, setLogin] = useState(false);
+  const [localUser, setLocalUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [responseErr, setError] = useState('');
   const [formState, setFormState] = useState({
@@ -32,6 +33,7 @@ const LoginScreen = () => {
 
   useEffect(() => {
     setHomeRoute('MainHome');
+    getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
   }, []);
 
   const handleLogin = async () =>
@@ -105,11 +107,12 @@ const LoginScreen = () => {
 
     if (login) {
       handleLogin()
-        .then(({ record: { email, username, id, token } }) => {
+        .then(({ record: { email, username, id, token, favorites } }) => {
           const newUser = {
             id,
             email,
             username,
+            favorites,
             token,
           };
           setUser(newUser);
@@ -128,11 +131,12 @@ const LoginScreen = () => {
         .create(userData)
         .then(() => {
           handleLogin()
-            .then(({ record: { email, username, id, token } }) => {
+            .then(({ record: { email, username, id, token, favorites } }) => {
               const newUser = {
                 id,
                 email,
                 username,
+                favorites,
                 token,
               };
               setUser(newUser);
@@ -147,7 +151,12 @@ const LoginScreen = () => {
     setLoading(false);
   };
 
-  if (user) return null;
+  if (user || localUser)
+    return (
+      <View className="bg-black h-full flex justify-center items-center">
+        <Text className="text-white text-xl">Loading...</Text>
+      </View>
+    );
 
   return (
     <KeyboardAvoidingView

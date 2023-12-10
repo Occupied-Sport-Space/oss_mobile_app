@@ -40,7 +40,7 @@ export default {
         projectId: '14b4ec00-de12-45b0-a39d-8a44b620c90f',
       },
     },
-    owner: 'psorigins',
+    owner: 'occupied_sport_space',
     runtimeVersion: {
       policy: 'sdkVersion',
     },

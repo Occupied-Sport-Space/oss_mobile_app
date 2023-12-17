@@ -124,7 +124,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     });
 
     socket.on('newCount', (space: Space) => {
-      setDetailPark(space);
+      if (detailPark.id === space.id) {
+        setDetailPark(space);
+      }
     });
 
     pb.collection('sportSpaces').subscribe(

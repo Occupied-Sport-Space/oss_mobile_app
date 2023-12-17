@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CarouselCardItem from '../../../components/CarouselCardItem';
@@ -10,9 +11,7 @@ import {
   userState,
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
-import { pb } from '../../../utils/pocketbase';
-import { Space } from '../../../types/types';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getSpaces } from '../../../utils/rest';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
@@ -24,11 +23,9 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   useEffect(() => {
     setHomeRoute('MainHome');
 
-    pb.collection('sportSpaces')
-      .getFullList()
-      .then((data: unknown) => {
-        setSportSpaces(data as Space[]);
-      });
+    getSpaces().then(({ data }) => {
+      setSportSpaces(data);
+    });
   }, []);
 
   if (!sportSpaces || !user)

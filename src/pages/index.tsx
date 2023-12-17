@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useEffect } from 'react';
+import { io } from 'socket.io-client';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeTabs from './Home/HomeTabs';
 import MapTabs from './Map/MapTabs';
@@ -18,6 +19,7 @@ export type RootStackParamList = {
 };
 
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
+export const socket = io('http://localhost:8000');
 
 const AppRouter = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -40,6 +42,14 @@ const AppRouter = () => {
           });
       }
     });
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   if (!user) {

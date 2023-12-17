@@ -22,6 +22,7 @@ import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
 import { pb } from '../../utils/pocketbase';
 import { DurationEnum, Space } from '../../types/types';
+import { socket } from '../../pages';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -120,6 +121,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     scrollRef.current?.scrollTo({
       y: 0,
       animated: true,
+    });
+
+    socket.on('newCount', (space: Space) => {
+      setDetailPark(space);
     });
 
     pb.collection('sportSpaces').subscribe(

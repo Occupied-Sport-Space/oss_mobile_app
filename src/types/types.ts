@@ -19,17 +19,17 @@ export interface Price {
 }
 
 export interface Space {
-  id: string
+  id: string;
   coords: {
-    latitude: number,
-    longitude: number
-  }
-  name: string
-  link: string
+    latitude: number;
+    longitude: number;
+  };
+  name: string;
+  link: string;
   price: Price[] | Price;
-  logo: string
+  logo: string;
   markerLogo: string;
-  availability: number;
+  availability: number[];
   maxAvailable: number;
   estimateWait: string;
   address: string;
@@ -37,7 +37,7 @@ export interface Space {
 
 export interface User {
   id: string;
-  username: string;
+  name: string;
   favorites: string[];
   email: string;
   token: string;

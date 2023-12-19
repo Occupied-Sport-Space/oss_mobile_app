@@ -1,10 +1,9 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../../state/atoms';
-import { pb } from '../../../utils/pocketbase';
 import { StorageKeys, setItem } from '../../../utils/asyncStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SettingsTabProps } from '../SettingsTabs';
@@ -61,29 +60,13 @@ const SettingsScreen: FC<
   const [newInfo, setNewInfo] = useState({ ...user });
 
   const handleLogout = () => {
-    pb.authStore.clear();
     setItem(StorageKeys.USER, '');
     setUser(null);
   };
 
   const handleSave = () => {
     if (user) {
-      pb.collection('users')
-        .update(user.id, {
-          username: newInfo.username,
-          email: newInfo.email,
-        })
-        .then(({ id, email, username, token, favorites }) => {
-          const newUser = {
-            id,
-            email,
-            username,
-            token,
-            favorites,
-          };
-          setUser(newUser);
-          setNewInfo(newUser);
-        });
+      // ! TOOD: add update user func, when BE is ready
     }
   };
 
@@ -93,9 +76,9 @@ const SettingsScreen: FC<
     <View className="bg-black w-[100vw] h-[100vh] p-4">
       <EditItem
         title="Username"
-        value={newInfo.username!}
-        onChange={(username) => setNewInfo({ ...newInfo, username })}
-        onCancel={() => setNewInfo({ ...newInfo, username: user?.username })}
+        value={newInfo.name!}
+        onChange={(name) => setNewInfo({ ...newInfo, name })}
+        onCancel={() => setNewInfo({ ...newInfo, name: user?.name })}
       />
       <View className="py-1"></View>
       <EditItem

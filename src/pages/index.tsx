@@ -9,8 +9,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../state/atoms';
 import LoginScreen from './Home/Screens/Authentication/LoginScreen';
-import { StorageKeys, getItem } from '../utils/asyncStorage';
-import { pb } from '../utils/pocketbase';
+import { StorageKeys, getItem, setItem } from '../utils/asyncStorage';
+import { getLoginURL } from '../utils/rest';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -28,18 +28,12 @@ const AppRouter = () => {
   useEffect(() => {
     getItem(StorageKeys.USER).then((data) => {
       if (data) {
-        pb.collection('users')
-          .authWithPassword(data.email, data.password)
-          .then(({ record: { email, username, id, token, favorites } }) => {
-            const newUser = {
-              id,
-              email,
-              username,
-              token,
-              favorites,
-            };
-            setUser(newUser);
-          });
+        const { email, password } = data;
+
+        getLoginURL(email, password).then(({ data }) => {
+          setUser(data);
+          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
+        });
       }
     });
 

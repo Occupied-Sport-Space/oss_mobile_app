@@ -4,8 +4,8 @@ import { Card, Text, Button } from 'react-native-paper';
 import { useRecoilState } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
 import Input from '../../../../components/Input';
-import { pb } from '../../../../utils/pocketbase';
 import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
+import { getLoginURL, getRegisterURL } from '../../../../utils/rest';
 
 const LoginScreen = () => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
@@ -35,9 +35,6 @@ const LoginScreen = () => {
     setHomeRoute('MainHome');
     getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
   }, []);
-
-  const handleLogin = async () =>
-    pb.collection('users').authWithPassword(email, password);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -101,51 +98,23 @@ const LoginScreen = () => {
           passwordConfirm: '',
         },
       });
-      setError(err.data.message);
-      console.log(err.data);
+      console.log(err);
+      setError('Invalid credentials!');
     };
 
     if (login) {
-      handleLogin()
-        .then(({ record: { email, username, id, token, favorites } }) => {
-          const newUser = {
-            id,
-            email,
-            username,
-            favorites,
-            token,
-          };
-          setUser(newUser);
+      getLoginURL(email, password)
+        .then(({ data }) => {
+          setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
         .catch(handleError)
         .then(() => setLoading(false));
     } else {
-      const userData = {
-        email,
-        password,
-        passwordConfirm,
-        username: name,
-      };
-      pb.collection('users')
-        .create(userData)
-        .then(() => {
-          handleLogin()
-            .then(({ record: { email, username, id, token, favorites } }) => {
-              const newUser = {
-                id,
-                email,
-                username,
-                favorites,
-                token,
-              };
-              setUser(newUser);
-              setItem(StorageKeys.USER, JSON.stringify(newUser));
-            })
-            .catch(handleError)
-            .then(() => setLoading(false));
-        })
-        .catch(handleError);
+      getRegisterURL(name, password, email).then(({ data }) => {
+        setUser(data);
+        setItem(StorageKeys.USER, JSON.stringify({ email, password }));
+      });
     }
 
     setLoading(false);

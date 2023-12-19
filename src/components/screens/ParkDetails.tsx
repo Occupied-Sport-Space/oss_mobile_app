@@ -20,9 +20,9 @@ import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
-import { pb } from '../../utils/pocketbase';
 import { DurationEnum, Space } from '../../types/types';
 import { socket } from '../../pages';
+import { toggleFavorite } from '../../utils/rest';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -68,26 +68,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   };
 
   const handleFavourite = () => {
-    pb.collection('users')
-      .update(
-        user!.id,
-        !favorite
-          ? {
-              'favorites+': id,
-            }
-          : { 'favorites-': id }
-      )
-      .then(({ email, username, id, token, favorites }) => {
-        const newUser = {
-          id,
-          email,
-          username,
-          token,
-          favorites,
-        };
-        setUser(newUser);
-        setFavorite(!favorite);
-      });
+    toggleFavorite(user!.token, id).then(({ data }) => {
+      setUser(data);
+      setFavorite(!favorite);
+    });
   };
 
   const getText = (duration: DurationEnum) => {
@@ -128,23 +112,15 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         setDetailPark(space);
       }
     });
-
-    pb.collection('sportSpaces').subscribe(
-      id,
-      ({ record, action }: { action: string; record: unknown }) => {
-        if (action === 'update') {
-          setDetailPark(record as Space);
-        }
-      }
-    );
-
-    return () => {
-      pb.collection('sportSpaces').unsubscribe(id);
-    };
   }, [id]);
 
   useEffect(() => {
-    setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
+    let usableAvailability = 0;
+    availability.forEach((num) => (usableAvailability += num));
+
+    setPercentageAvailable(
+      Math.round((100 * usableAvailability) / maxAvailable)
+    );
   }, [availability, maxAvailable]);
 
   return (

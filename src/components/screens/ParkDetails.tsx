@@ -115,8 +115,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   }, [id]);
 
   useEffect(() => {
-    let usableAvailability = 0;
-    availability.forEach((num) => (usableAvailability += num));
+    const usableAvailability = availability.reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
 
     setPercentageAvailable(
       Math.round((100 * usableAvailability) / maxAvailable)

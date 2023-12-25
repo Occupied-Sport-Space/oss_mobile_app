@@ -5,7 +5,7 @@ import { useRecoilState } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
 import Input from '../../../../components/Input';
 import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
-import { getLoginURL, getRegisterURL } from '../../../../utils/rest';
+import { getLogin, getRegister } from '../../../../utils/rest';
 
 const LoginScreen = () => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
@@ -103,7 +103,7 @@ const LoginScreen = () => {
     };
 
     if (login) {
-      getLoginURL(email, password)
+      getLogin(email, password)
         .then(({ data }) => {
           setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
@@ -111,7 +111,7 @@ const LoginScreen = () => {
         .catch(handleError)
         .then(() => setLoading(false));
     } else {
-      getRegisterURL(name, password, email).then(({ data }) => {
+      getRegister(name, password, email).then(({ data }) => {
         setUser(data);
         setItem(StorageKeys.USER, JSON.stringify({ email, password }));
       });

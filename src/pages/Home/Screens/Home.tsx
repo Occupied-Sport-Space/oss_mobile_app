@@ -40,7 +40,7 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
       <Text className="text-white text-3xl my-5 mx-2">
         Welcome, <Text className="text-blue-300 text-4xl">{user.name}</Text>
       </Text>
-      {user && user.favorites && (
+      {user && user.favorites && !!user.favorites.length && (
         <>
           <Text className="text-white text-xl mt-2 mx-2">
             Favorite courts{' '}

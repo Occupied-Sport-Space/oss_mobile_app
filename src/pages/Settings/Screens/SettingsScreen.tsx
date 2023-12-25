@@ -4,9 +4,10 @@ import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../../state/atoms';
-import { StorageKeys, setItem } from '../../../utils/asyncStorage';
+import { StorageKeys, getItem, setItem } from '../../../utils/asyncStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SettingsTabProps } from '../SettingsTabs';
+import { editUser } from '../../../utils/rest';
 
 interface EditItemProps {
   title: string;
@@ -67,6 +68,15 @@ const SettingsScreen: FC<
   const handleSave = () => {
     if (user) {
       // ! TOOD: add update user func, when BE is ready
+      editUser(user.token, newInfo).then(({ data }) => {
+        getItem(StorageKeys.USER).then(({ password }) => {
+          setUser(data);
+          setItem(
+            StorageKeys.USER,
+            JSON.stringify({ email: data.email, password })
+          );
+        });
+      });
     }
   };
 

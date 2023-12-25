@@ -42,3 +42,8 @@ export interface User {
   email: string;
   token: string;
 }
+
+export interface EditUserProps {
+  name?: string;
+  email?: string;
+}

@@ -10,7 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../state/atoms';
 import LoginScreen from './Home/Screens/Authentication/LoginScreen';
 import { StorageKeys, getItem, setItem } from '../utils/asyncStorage';
-import { getLoginURL } from '../utils/rest';
+import { getLogin } from '../utils/rest';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -30,7 +30,7 @@ const AppRouter = () => {
       if (data) {
         const { email, password } = data;
 
-        getLoginURL(email, password).then(({ data }) => {
+        getLogin(email, password).then(({ data }) => {
           setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         });

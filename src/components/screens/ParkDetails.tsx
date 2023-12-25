@@ -107,7 +107,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       animated: true,
     });
 
-    socket.on('newCount', (space: Space) => {
+    socket.on('update', (space: Space) => {
       if (detailPark.id === space.id) {
         setDetailPark(space);
       }

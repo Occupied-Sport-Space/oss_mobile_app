@@ -31,10 +31,23 @@ const LoginScreen = () => {
     [formState]
   );
 
-  useEffect(() => {
-    setHomeRoute('MainHome');
-    getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
-  }, []);
+  const resetErrors = () =>
+    setFormState({
+      ...formState,
+      errors: {
+        email: '',
+        name: '',
+        password: '',
+        passwordConfirm: '',
+      },
+    });
+
+  // ! TODO: add error handling
+  const handleError = (err: any) => {
+    resetErrors();
+    console.log(err);
+    setError('Invalid credentials!');
+  };
 
   const handleSubmit = () => {
     setLoading(true);
@@ -72,7 +85,8 @@ const LoginScreen = () => {
           email: errors.email,
           name: errors.name,
           passwordConfirm: errors.passwordConfirm,
-          password: 'Password must include an uppercase letter and a number!',
+          password:
+            'Password must include an uppercase letter, a number, a special character and should be at least 8 characters long!',
         },
       });
     } else if (password !== passwordConfirm && !login) {
@@ -87,20 +101,6 @@ const LoginScreen = () => {
         },
       });
     }
-
-    const handleError = (err: any) => {
-      setFormState({
-        ...formState,
-        errors: {
-          email: '',
-          name: '',
-          password: '',
-          passwordConfirm: '',
-        },
-      });
-      console.log(err);
-      setError('Invalid credentials!');
-    };
 
     if (login) {
       getLogin(email, password)
@@ -119,6 +119,11 @@ const LoginScreen = () => {
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    setHomeRoute('MainHome');
+    getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
+  }, []);
 
   if (user || localUser)
     return (
@@ -195,7 +200,10 @@ const LoginScreen = () => {
               disabled={loading}
               className="mx-auto rounded-md w-[45%]"
               icon="account"
-              onPress={() => (login ? setLogin(false) : handleSubmit())}
+              onPress={() => {
+                resetErrors();
+                return login ? setLogin(false) : handleSubmit();
+              }}
             >
               Register
             </Button>
@@ -206,7 +214,10 @@ const LoginScreen = () => {
               buttonColor="white"
               className="mx-auto rounded-md w-[45%]"
               icon="account"
-              onPress={() => (login ? handleSubmit() : setLogin(true))}
+              onPress={() => {
+                resetErrors();
+                return login ? handleSubmit() : setLogin(true);
+              }}
             >
               Login
             </Button>

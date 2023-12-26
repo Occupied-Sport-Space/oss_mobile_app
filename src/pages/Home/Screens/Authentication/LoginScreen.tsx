@@ -7,6 +7,11 @@ import Input from '../../../../components/Input';
 import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
 import { getLogin, getRegister } from '../../../../utils/rest';
 
+const errorCodes = {
+  INVALID_CREDENTIALS: 'Invalid credentials!',
+  USER_ALREADY_EXISTS: 'User already exists!',
+};
+
 const LoginScreen = () => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
   const [user, setUser] = useRecoilState(userState);
@@ -42,11 +47,13 @@ const LoginScreen = () => {
       },
     });
 
-  // ! TODO: add error handling
-  const handleError = (err: any) => {
+  const handleError = ({
+    response: {
+      data: { error },
+    },
+  }: any) => {
     resetErrors();
-    console.log(err);
-    setError('Invalid credentials!');
+    setError(errorCodes[error] || error);
   };
 
   const handleSubmit = () => {
@@ -108,13 +115,14 @@ const LoginScreen = () => {
           setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
-        .catch(handleError)
-        .then(() => setLoading(false));
+        .catch(handleError);
     } else {
-      getRegister(name, password, email).then(({ data }) => {
-        setUser(data);
-        setItem(StorageKeys.USER, JSON.stringify({ email, password }));
-      });
+      getRegister(name, password, email)
+        .then(({ data }) => {
+          setUser(data);
+          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
+        })
+        .catch(handleError);
     }
 
     setLoading(false);

@@ -33,6 +33,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const sportSpaces = useRecoilValue(sportSpaceState);
   const [user, setUser] = useRecoilState(userState);
   const [percentageAvailable, setPercentageAvailable] = useState(0);
+  const [usableAvailability, setUsableAvailability] = useState(0);
   const [favorite, setFavorite] = useState(false);
   const [detailPark, setDetailPark] = useState(
     sportSpaces?.find((park) => park.id === id)
@@ -120,6 +121,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       0
     );
 
+    setUsableAvailability(usableAvailability);
     setPercentageAvailable(
       Math.round((100 * usableAvailability) / maxAvailable)
     );
@@ -140,7 +142,8 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         </View>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
-            Avalability {availability}/{maxAvailable} ({percentageAvailable}%)
+            Avalability {usableAvailability}/{maxAvailable} (
+            {percentageAvailable}%)
           </Text>
           <View className="bg-gray-400 rounded-md">
             <View

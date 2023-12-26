@@ -12,13 +12,20 @@ import { editUser } from '../../../utils/rest';
 interface EditItemProps {
   title: string;
   value: string;
+  showInput: boolean;
+  setShowInput: (show: boolean) => void;
   onChange: (text: string) => void;
   onCancel: () => void;
 }
 
-const EditItem: FC<EditItemProps> = ({ title, value, onChange, onCancel }) => {
-  const [showInput, setShowInput] = useState(false);
-
+const EditItem: FC<EditItemProps> = ({
+  title,
+  value,
+  onChange,
+  onCancel,
+  showInput,
+  setShowInput,
+}) => {
   return (
     <View className="flex-row justify-left items-center gap-4">
       <Text className="text-white text-xl">{title}:</Text>
@@ -59,6 +66,9 @@ const SettingsScreen: FC<
 > = ({ navigation }) => {
   const [user, setUser] = useRecoilState(userState);
   const [newInfo, setNewInfo] = useState({ ...user });
+  const [visibleInputs, setVisibleInputs] = useState({
+    name: false,
+  });
 
   const handleLogout = () => {
     setItem(StorageKeys.USER, '');
@@ -75,6 +85,7 @@ const SettingsScreen: FC<
             StorageKeys.USER,
             JSON.stringify({ email: data.email, password })
           );
+          setVisibleInputs({ name: false });
         });
       });
     }
@@ -87,15 +98,12 @@ const SettingsScreen: FC<
       <EditItem
         title="Username"
         value={newInfo.name!}
+        showInput={visibleInputs.name}
+        setShowInput={(show) =>
+          setVisibleInputs({ ...visibleInputs, name: show })
+        }
         onChange={(name) => setNewInfo({ ...newInfo, name })}
         onCancel={() => setNewInfo({ ...newInfo, name: user?.name })}
-      />
-      <View className="py-1"></View>
-      <EditItem
-        title="Email"
-        value={newInfo.email!}
-        onChange={(email) => setNewInfo({ ...newInfo, email })}
-        onCancel={() => setNewInfo({ ...newInfo, email: user?.email })}
       />
       {JSON.stringify(newInfo) !== JSON.stringify(user) && (
         <View className="mt-4">

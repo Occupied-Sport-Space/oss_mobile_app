@@ -195,7 +195,7 @@ const LoginScreen = () => {
           )}
           {responseErr && (
             <View>
-              <Text className="my-2 text-red-400 font-semibold text-center">
+              <Text className="mt-2 mb-4 text-red-400 font-semibold text-center">
                 {responseErr}
               </Text>
             </View>

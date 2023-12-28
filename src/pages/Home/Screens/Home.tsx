@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CarouselCardItem from '../../../components/CarouselCardItem';
@@ -10,9 +11,7 @@ import {
   userState,
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
-import { pb } from '../../../utils/pocketbase';
-import { Space } from '../../../types/types';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getSpaces } from '../../../utils/rest';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
@@ -24,11 +23,9 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   useEffect(() => {
     setHomeRoute('MainHome');
 
-    pb.collection('sportSpaces')
-      .getFullList()
-      .then((data: unknown) => {
-        setSportSpaces(data as Space[]);
-      });
+    getSpaces(user!.token).then(({ data }) => {
+      setSportSpaces(data);
+    });
   }, []);
 
   if (!sportSpaces || !user)
@@ -41,9 +38,9 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   return (
     <ScrollView className="flex-1 bg-black bg-opacity-30 text-white">
       <Text className="text-white text-3xl my-5 mx-2">
-        Welcome, <Text className="text-blue-300 text-4xl">{user.username}</Text>
+        Welcome, <Text className="text-blue-300 text-4xl">{user.name}</Text>
       </Text>
-      {user && user.favorites && (
+      {user && user.favorites && !!user.favorites.length && (
         <>
           <Text className="text-white text-xl mt-2 mx-2">
             Favorite courts{' '}

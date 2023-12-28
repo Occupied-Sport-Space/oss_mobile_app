@@ -4,8 +4,13 @@ import { Card, Text, Button } from 'react-native-paper';
 import { useRecoilState } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
 import Input from '../../../../components/Input';
-import { pb } from '../../../../utils/pocketbase';
 import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
+import { getLogin, getRegister } from '../../../../utils/rest';
+
+const errorCodes = {
+  INVALID_CREDENTIALS: 'Invalid credentials!',
+  USER_ALREADY_EXISTS: 'User already exists!',
+};
 
 const LoginScreen = () => {
   const [_, setHomeRoute] = useRecoilState(homeNativeStackRouteState);
@@ -31,13 +36,25 @@ const LoginScreen = () => {
     [formState]
   );
 
-  useEffect(() => {
-    setHomeRoute('MainHome');
-    getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
-  }, []);
+  const resetErrors = () =>
+    setFormState({
+      ...formState,
+      errors: {
+        email: '',
+        name: '',
+        password: '',
+        passwordConfirm: '',
+      },
+    });
 
-  const handleLogin = async () =>
-    pb.collection('users').authWithPassword(email, password);
+  const handleError = ({
+    response: {
+      data: { error },
+    },
+  }: any) => {
+    resetErrors();
+    setError(errorCodes[error] || error);
+  };
 
   const handleSubmit = () => {
     setLoading(true);
@@ -75,7 +92,8 @@ const LoginScreen = () => {
           email: errors.email,
           name: errors.name,
           passwordConfirm: errors.passwordConfirm,
-          password: 'Password must include an uppercase letter and a number!',
+          password:
+            'Password must include an uppercase letter, a number, a special character and should be at least 8 characters long!',
         },
       });
     } else if (password !== passwordConfirm && !login) {
@@ -91,65 +109,29 @@ const LoginScreen = () => {
       });
     }
 
-    const handleError = (err: any) => {
-      setFormState({
-        ...formState,
-        errors: {
-          email: '',
-          name: '',
-          password: '',
-          passwordConfirm: '',
-        },
-      });
-      setError(err.data.message);
-      console.log(err.data);
-    };
-
     if (login) {
-      handleLogin()
-        .then(({ record: { email, username, id, token, favorites } }) => {
-          const newUser = {
-            id,
-            email,
-            username,
-            favorites,
-            token,
-          };
-          setUser(newUser);
+      getLogin(email, password)
+        .then(({ data }) => {
+          setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
-        .catch(handleError)
-        .then(() => setLoading(false));
+        .catch(handleError);
     } else {
-      const userData = {
-        email,
-        password,
-        passwordConfirm,
-        username: name,
-      };
-      pb.collection('users')
-        .create(userData)
-        .then(() => {
-          handleLogin()
-            .then(({ record: { email, username, id, token, favorites } }) => {
-              const newUser = {
-                id,
-                email,
-                username,
-                favorites,
-                token,
-              };
-              setUser(newUser);
-              setItem(StorageKeys.USER, JSON.stringify(newUser));
-            })
-            .catch(handleError)
-            .then(() => setLoading(false));
+      getRegister(name, password, email)
+        .then(({ data }) => {
+          setUser(data);
+          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
         .catch(handleError);
     }
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    setHomeRoute('MainHome');
+    getItem(StorageKeys.USER).then((data) => data && setLocalUser(data));
+  }, []);
 
   if (user || localUser)
     return (
@@ -213,7 +195,7 @@ const LoginScreen = () => {
           )}
           {responseErr && (
             <View>
-              <Text className="my-2 text-red-400 font-semibold text-center">
+              <Text className="mt-2 mb-4 text-red-400 font-semibold text-center">
                 {responseErr}
               </Text>
             </View>
@@ -226,7 +208,10 @@ const LoginScreen = () => {
               disabled={loading}
               className="mx-auto rounded-md w-[45%]"
               icon="account"
-              onPress={() => (login ? setLogin(false) : handleSubmit())}
+              onPress={() => {
+                resetErrors();
+                return login ? setLogin(false) : handleSubmit();
+              }}
             >
               Register
             </Button>
@@ -237,7 +222,10 @@ const LoginScreen = () => {
               buttonColor="white"
               className="mx-auto rounded-md w-[45%]"
               icon="account"
-              onPress={() => (login ? handleSubmit() : setLogin(true))}
+              onPress={() => {
+                resetErrors();
+                return login ? handleSubmit() : setLogin(true);
+              }}
             >
               Login
             </Button>

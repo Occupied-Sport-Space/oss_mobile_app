@@ -1,24 +1,31 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../../state/atoms';
-import { pb } from '../../../utils/pocketbase';
-import { StorageKeys, setItem } from '../../../utils/asyncStorage';
+import { StorageKeys, getItem, setItem } from '../../../utils/asyncStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SettingsTabProps } from '../SettingsTabs';
+import { editUser } from '../../../utils/rest';
 
 interface EditItemProps {
   title: string;
   value: string;
+  showInput: boolean;
+  setShowInput: (show: boolean) => void;
   onChange: (text: string) => void;
   onCancel: () => void;
 }
 
-const EditItem: FC<EditItemProps> = ({ title, value, onChange, onCancel }) => {
-  const [showInput, setShowInput] = useState(false);
-
+const EditItem: FC<EditItemProps> = ({
+  title,
+  value,
+  onChange,
+  onCancel,
+  showInput,
+  setShowInput,
+}) => {
   return (
     <View className="flex-row justify-left items-center gap-4">
       <Text className="text-white text-xl">{title}:</Text>
@@ -59,31 +66,28 @@ const SettingsScreen: FC<
 > = ({ navigation }) => {
   const [user, setUser] = useRecoilState(userState);
   const [newInfo, setNewInfo] = useState({ ...user });
+  const [visibleInputs, setVisibleInputs] = useState({
+    name: false,
+  });
 
   const handleLogout = () => {
-    pb.authStore.clear();
     setItem(StorageKeys.USER, '');
     setUser(null);
   };
 
   const handleSave = () => {
     if (user) {
-      pb.collection('users')
-        .update(user.id, {
-          username: newInfo.username,
-          email: newInfo.email,
-        })
-        .then(({ id, email, username, token, favorites }) => {
-          const newUser = {
-            id,
-            email,
-            username,
-            token,
-            favorites,
-          };
-          setUser(newUser);
-          setNewInfo(newUser);
+      // ! TOOD: add update user func, when BE is ready
+      editUser(user.token, newInfo).then(({ data }) => {
+        getItem(StorageKeys.USER).then(({ password }) => {
+          setUser(data);
+          setItem(
+            StorageKeys.USER,
+            JSON.stringify({ email: data.email, password })
+          );
+          setVisibleInputs({ name: false });
         });
+      });
     }
   };
 
@@ -93,16 +97,13 @@ const SettingsScreen: FC<
     <View className="bg-black w-[100vw] h-[100vh] p-4">
       <EditItem
         title="Username"
-        value={newInfo.username!}
-        onChange={(username) => setNewInfo({ ...newInfo, username })}
-        onCancel={() => setNewInfo({ ...newInfo, username: user?.username })}
-      />
-      <View className="py-1"></View>
-      <EditItem
-        title="Email"
-        value={newInfo.email!}
-        onChange={(email) => setNewInfo({ ...newInfo, email })}
-        onCancel={() => setNewInfo({ ...newInfo, email: user?.email })}
+        value={newInfo.name!}
+        showInput={visibleInputs.name}
+        setShowInput={(show) =>
+          setVisibleInputs({ ...visibleInputs, name: show })
+        }
+        onChange={(name) => setNewInfo({ ...newInfo, name })}
+        onCancel={() => setNewInfo({ ...newInfo, name: user?.name })}
       />
       {JSON.stringify(newInfo) !== JSON.stringify(user) && (
         <View className="mt-4">

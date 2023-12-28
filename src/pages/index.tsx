@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useEffect } from 'react';
+import { io } from 'socket.io-client';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeTabs from './Home/HomeTabs';
 import MapTabs from './Map/MapTabs';
@@ -8,8 +9,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { homeNativeStackRouteState, userState } from '../state/atoms';
 import LoginScreen from './Home/Screens/Authentication/LoginScreen';
-import { StorageKeys, getItem } from '../utils/asyncStorage';
-import { pb } from '../utils/pocketbase';
+import { StorageKeys, getItem, setItem } from '../utils/asyncStorage';
+import { getLogin } from '../utils/rest';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -18,6 +19,7 @@ export type RootStackParamList = {
 };
 
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
+export const socket = io('https://oss-be.up.railway.app');
 
 const AppRouter = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -26,20 +28,22 @@ const AppRouter = () => {
   useEffect(() => {
     getItem(StorageKeys.USER).then((data) => {
       if (data) {
-        pb.collection('users')
-          .authWithPassword(data.email, data.password)
-          .then(({ record: { email, username, id, token, favorites } }) => {
-            const newUser = {
-              id,
-              email,
-              username,
-              token,
-              favorites,
-            };
-            setUser(newUser);
-          });
+        const { email, password } = data;
+
+        getLogin(email, password).then(({ data }) => {
+          setUser(data);
+          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
+        });
       }
     });
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   if (!user) {

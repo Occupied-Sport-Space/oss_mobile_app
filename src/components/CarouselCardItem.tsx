@@ -16,7 +16,14 @@ const CarouselCardItem: FC<CardItemProps> = ({ park, onPress }) => {
   const [percentageAvailable, setPercentageAvailable] = useState(0);
 
   useEffect(() => {
-    setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
+    const usableAvailability = availability.reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
+
+    setPercentageAvailable(
+      Math.round((100 * usableAvailability) / maxAvailable)
+    );
   }, [availability, maxAvailable]);
 
   return (

@@ -20,8 +20,9 @@ import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
-import { pb } from '../../utils/pocketbase';
 import { DurationEnum, Space } from '../../types/types';
+import { socket } from '../../pages';
+import { toggleFavorite } from '../../utils/rest';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -32,6 +33,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   const sportSpaces = useRecoilValue(sportSpaceState);
   const [user, setUser] = useRecoilState(userState);
   const [percentageAvailable, setPercentageAvailable] = useState(0);
+  const [usableAvailability, setUsableAvailability] = useState(0);
   const [favorite, setFavorite] = useState(false);
   const [detailPark, setDetailPark] = useState(
     sportSpaces?.find((park) => park.id === id)
@@ -67,26 +69,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
   };
 
   const handleFavourite = () => {
-    pb.collection('users')
-      .update(
-        user!.id,
-        !favorite
-          ? {
-              'favorites+': id,
-            }
-          : { 'favorites-': id }
-      )
-      .then(({ email, username, id, token, favorites }) => {
-        const newUser = {
-          id,
-          email,
-          username,
-          token,
-          favorites,
-        };
-        setUser(newUser);
-        setFavorite(!favorite);
-      });
+    toggleFavorite(user!.token, id).then(({ data }) => {
+      setUser(data);
+      setFavorite(!favorite);
+    });
   };
 
   const getText = (duration: DurationEnum) => {
@@ -122,22 +108,23 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       animated: true,
     });
 
-    pb.collection('sportSpaces').subscribe(
-      id,
-      ({ record, action }: { action: string; record: unknown }) => {
-        if (action === 'update') {
-          setDetailPark(record as Space);
-        }
+    socket.on('update', (space: Space) => {
+      if (detailPark.id === space.id) {
+        setDetailPark(space);
       }
-    );
-
-    return () => {
-      pb.collection('sportSpaces').unsubscribe(id);
-    };
+    });
   }, [id]);
 
   useEffect(() => {
-    setPercentageAvailable(Math.round((100 * availability) / maxAvailable));
+    const usableAvailability = availability.reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
+
+    setUsableAvailability(usableAvailability);
+    setPercentageAvailable(
+      Math.round((100 * usableAvailability) / maxAvailable)
+    );
   }, [availability, maxAvailable]);
 
   return (
@@ -155,7 +142,8 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
         </View>
         <View className="mt-3 mb-4">
           <Text className="text-white text-2xl font-semibold mb-2">
-            Avalability {availability}/{maxAvailable} ({percentageAvailable}%)
+            Avalability {usableAvailability}/{maxAvailable} (
+            {percentageAvailable}%)
           </Text>
           <View className="bg-gray-400 rounded-md">
             <View

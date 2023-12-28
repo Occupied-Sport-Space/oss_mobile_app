@@ -19,7 +19,7 @@ export type RootStackParamList = {
 };
 
 const { Navigator, Screen } = createBottomTabNavigator<RootStackParamList>();
-export const socket = io('http://localhost:8000');
+export const socket = io('https://oss-be.up.railway.app');
 
 const AppRouter = () => {
   const [user, setUser] = useRecoilState(userState);

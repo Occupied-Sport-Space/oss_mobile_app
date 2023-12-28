@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { EditUserProps } from 'src/types/types';
 
-const URL = 'http://localhost:8000';
+const URL = 'https://oss-be.up.railway.app';
 
 const formatURL = (endpoint: string, token?: string) =>
   `${URL}${endpoint}${token ? `?token=${token}` : ''}`;

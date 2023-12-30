@@ -57,14 +57,14 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       {
         text: 'Open on "Google Maps"',
         onPress: () =>
-          appendPlanningToGo(user!.token, id).then(() => {
+          appendPlanningToGo(user!.token, id).finally(() => {
             Linking.openURL(`google.navigation:q=${latitude}+${longitude}`);
           }),
       },
       {
         text: 'Open on "Apple Maps"',
         onPress: () =>
-          appendPlanningToGo(user!.token, id).then(() => {
+          appendPlanningToGo(user!.token, id).finally(() => {
             Linking.openURL(`maps://app?daddr=${latitude}+${longitude}`);
           }),
       },

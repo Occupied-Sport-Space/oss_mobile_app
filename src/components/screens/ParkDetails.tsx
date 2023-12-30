@@ -151,7 +151,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
           </View>
           <Text className="text-lg text-gray-300">
             Currently on route: {planningOnGoing}{' '}
-            {!!planningOnGoing && planningOnGoing > 1 ? 'people' : 'person'}
+            {planningOnGoing > 1 || !planningOnGoing ? 'people' : 'person'}
           </Text>
         </View>
         <View className="bg-gray-700 mt-2 rounded-xl">

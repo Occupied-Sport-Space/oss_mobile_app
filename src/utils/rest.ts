@@ -18,3 +18,7 @@ export const toggleFavorite = (token: string, spaceId: string) =>
   axios.patch(formatURL('/add-favorite', token), {
     spaceId,
   });
+export const appendPlanningToGo = (token: string, spaceId: string) =>
+  axios.patch(formatURL('/spaces', token), {
+    spaceId,
+  });

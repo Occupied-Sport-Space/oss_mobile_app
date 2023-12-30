@@ -12,6 +12,8 @@ import {
 } from '../../../state/atoms';
 import { HomeTabProps } from '../HomeTabs';
 import { getSpaces } from '../../../utils/rest';
+import { socket } from '../../index';
+import { Space } from '../../../types/types';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
@@ -25,6 +27,13 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
 
     getSpaces(user!.token).then(({ data }) => {
       setSportSpaces(data);
+    });
+
+    socket.on('update', (space: Space) => {
+      setSportSpaces([
+        ...(sportSpaces || []).filter(({ id }) => id !== space.id),
+        space,
+      ]);
     });
   }, []);
 

@@ -33,6 +33,8 @@ export interface Space {
   maxAvailable: number;
   estimateWait: string;
   address: string;
+  planningOnGoing: number;
+  timeOut: number;
 }
 
 export interface User {

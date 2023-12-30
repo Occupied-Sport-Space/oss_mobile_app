@@ -20,9 +20,8 @@ import CarouselCardItem from '../CarouselCardItem';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import CustomMarker from '../CustomMarker';
-import { DurationEnum, Space } from '../../types/types';
-import { socket } from '../../pages';
-import { toggleFavorite } from '../../utils/rest';
+import { DurationEnum } from '../../types/types';
+import { appendPlanningToGo, toggleFavorite } from '../../utils/rest';
 
 type Props = NativeStackScreenProps<HomeTabProps, 'ParkDetail'>;
 
@@ -50,6 +49,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
     price,
     coords: { latitude, longitude },
     markerLogo,
+    planningOnGoing,
   } = detailPark;
 
   const onMapPress = () => {
@@ -57,12 +57,16 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       {
         text: 'Open on "Google Maps"',
         onPress: () =>
-          Linking.openURL(`google.navigation:q=${latitude}+${longitude}`),
+          appendPlanningToGo(user!.token, id).then(() => {
+            Linking.openURL(`google.navigation:q=${latitude}+${longitude}`);
+          }),
       },
       {
         text: 'Open on "Apple Maps"',
         onPress: () =>
-          Linking.openURL(`maps://app?daddr=${latitude}+${longitude}`),
+          appendPlanningToGo(user!.token, id).then(() => {
+            Linking.openURL(`maps://app?daddr=${latitude}+${longitude}`);
+          }),
       },
       { text: 'Cancel', onPress: () => null, style: 'cancel' },
     ]);
@@ -107,13 +111,7 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       y: 0,
       animated: true,
     });
-
-    socket.on('update', (space: Space) => {
-      if (detailPark.id === space.id) {
-        setDetailPark(space);
-      }
-    });
-  }, [id]);
+  }, [id, sportSpaces]);
 
   useEffect(() => {
     const usableAvailability = availability.reduce(
@@ -151,6 +149,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
               style={{ width: `${percentageAvailable}%` }}
             ></View>
           </View>
+          <Text className="text-lg text-gray-300">
+            Currently on route: {planningOnGoing}{' '}
+            {!!planningOnGoing && planningOnGoing > 1 ? 'people' : 'person'}
+          </Text>
         </View>
         <View className="bg-gray-700 mt-2 rounded-xl">
           <TouchableOpacity

@@ -27,13 +27,11 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
 
     getSpaces(user!.token).then(({ data }) => {
       setSportSpaces(data);
-    });
-
-    socket.on('update', (space: Space) => {
-      setSportSpaces([
-        ...(sportSpaces || []).filter(({ id }) => id !== space.id),
-        space,
-      ]);
+      socket.on('update', (space: Space) => {
+        const updatedData = [...data];
+        updatedData[data.findIndex(({ id }: Space) => id === space.id)] = space;
+        setSportSpaces(updatedData);
+      });
     });
   }, []);
 

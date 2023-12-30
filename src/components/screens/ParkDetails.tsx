@@ -130,7 +130,9 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
       <Image className="w-max h-[125px]" source={{ uri: logo }} />
       <View className="p-5">
         <View className="flex-row justify-between">
-          <Text className="text-white text-4xl font-bold mb-2">{name}</Text>
+          <Text className="text-white text-4xl max-w-[90%] font-bold mb-2">
+            {name}
+          </Text>
           <MaterialCommunityIcons
             name={favorite ? 'star' : 'star-outline'}
             color={favorite ? 'gold' : 'white'}
@@ -150,8 +152,10 @@ const ParkDetail: FC<Props> = ({ route, navigation }) => {
             ></View>
           </View>
           <Text className="text-lg text-gray-300">
-            Currently on route: {planningOnGoing}{' '}
-            {planningOnGoing > 1 || !planningOnGoing ? 'people' : 'person'}
+            Currently on route: {planningOnGoing.length}{' '}
+            {planningOnGoing.length > 1 || !planningOnGoing.length
+              ? 'people'
+              : 'person'}
           </Text>
         </View>
         <View className="bg-gray-700 mt-2 rounded-xl">

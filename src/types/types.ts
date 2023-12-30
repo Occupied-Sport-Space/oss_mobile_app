@@ -33,7 +33,7 @@ export interface Space {
   maxAvailable: number;
   estimateWait: string;
   address: string;
-  planningOnGoing: number;
+  planningOnGoing: string[];
   timeOut: number;
 }
 

@@ -30,10 +30,12 @@ const AppRouter = () => {
       if (data) {
         const { email, password } = data;
 
-        getLogin(email, password).then(({ data }) => {
-          setUser(data);
-          setItem(StorageKeys.USER, JSON.stringify({ email, password }));
-        });
+        getLogin(email, password)
+          .then(({ data }) => {
+            setUser(data);
+            setItem(StorageKeys.USER, JSON.stringify({ email, password }));
+          })
+          .catch(() => setUser(null));
       }
     });
 

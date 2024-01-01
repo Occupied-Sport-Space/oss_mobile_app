@@ -14,6 +14,7 @@ import { HomeTabProps } from '../HomeTabs';
 import { getSpaces } from '../../../utils/rest';
 import { socket } from '../../index';
 import { Space } from '../../../types/types';
+import Spinner from '../../../components/Spinner';
 
 const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   navigation,
@@ -38,7 +39,7 @@ const HomeScreen: FC<NativeStackScreenProps<HomeTabProps, 'MainHome'>> = ({
   if (!sportSpaces || !user)
     return (
       <View className="bg-black h-full flex justify-center items-center">
-        <Text className="text-white text-xl">Loading...</Text>
+        <Spinner />
       </View>
     );
 

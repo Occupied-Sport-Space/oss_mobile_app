@@ -6,6 +6,7 @@ import { homeNativeStackRouteState, userState } from '../../../../state/atoms';
 import Input from '../../../../components/Input';
 import { StorageKeys, getItem, setItem } from '../../../../utils/asyncStorage';
 import { getLogin, getRegister } from '../../../../utils/rest';
+import Spinner from '../../../../components/Spinner';
 
 const errorCodes = {
   INVALID_CREDENTIALS: 'Invalid credentials!',
@@ -136,7 +137,7 @@ const LoginScreen = () => {
   if (user || localUser)
     return (
       <View className="bg-black h-full flex justify-center items-center">
-        <Text className="text-white text-xl">Loading...</Text>
+        <Spinner />
       </View>
     );
 
@@ -203,7 +204,7 @@ const LoginScreen = () => {
           <View className="flex flex-row relative">
             {loading && (
               <View className="absolute z-50 flex justify-center items-center top-0 left-0 w-full h-full">
-                <View className="w-[30px] h-[30px] rounded-full border-solid border-[5px] border-[#60a5fa] border-t-gray-200" />
+                <Spinner />
               </View>
             )}
             <Button

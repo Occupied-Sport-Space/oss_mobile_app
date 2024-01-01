@@ -115,17 +115,17 @@ const LoginScreen = () => {
           setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
-        .catch(handleError);
+        .catch(handleError)
+        .finally(() => setLoading(false));
     } else {
       getRegister(name, password, email)
         .then(({ data }) => {
           setUser(data);
           setItem(StorageKeys.USER, JSON.stringify({ email, password }));
         })
-        .catch(handleError);
+        .catch(handleError)
+        .finally(() => setLoading(false));
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -200,7 +200,12 @@ const LoginScreen = () => {
               </Text>
             </View>
           )}
-          <View className="flex flex-row">
+          <View className="flex flex-row relative">
+            {loading && (
+              <View className="absolute z-50 flex justify-center items-center top-0 left-0 w-full h-full">
+                <View className="w-[30px] h-[30px] rounded-full border-solid border-[5px] border-[#60a5fa] border-t-gray-200" />
+              </View>
+            )}
             <Button
               mode="contained"
               textColor="white"
